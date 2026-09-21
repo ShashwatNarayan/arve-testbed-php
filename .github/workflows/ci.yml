@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      # TESTBED SEC-03
+      DEPLOY_API_TOKEN: "p3DTSbnpo02Y1edc9Z9szA6PcLTOEO0WnSNjsFq6"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo_sqlite
+      - name: Syntax check
+        run: find public src -name '*.php' -print0 | xargs -0 -n1 php -l
