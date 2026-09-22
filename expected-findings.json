@@ -1,0 +1,375 @@
+{
+  "schema_version": "2.0",
+  "repository": "arve-testbed-php",
+  "language": "php",
+  "description": "Ground truth for evaluating ARVE. Every positive finding was planted deliberately; every negative control must produce no finding.",
+  "advisory_data_verified": "2026-10-04",
+  "scanners": {
+    "gitleaks": "ghcr.io/gitleaks/gitleaks:v8.24.2",
+    "osv": "ghcr.io/google/osv-scanner:v1.9.2",
+    "semgrep": "semgrep/semgrep:1.90.0 + ARVE rulepack 2026.09.1",
+    "codeql": "not run: CodeQL has no PHP extractor"
+  },
+  "engine_expectations": {
+    "gitleaks": "run",
+    "osv": "run",
+    "semgrep": "run",
+    "codeql": "skipped"
+  },
+  "engine_expectations_note": "CodeQL does not support PHP. The correct ARVE outcome for this repository is a COMPLETED scan with the CodeQL engine reported as skipped: not PARTIAL, not FAILED.",
+  "all_credentials_synthetic": true,
+  "expected_counts": {
+    "gitleaks": 4,
+    "gitleaks_history": 5,
+    "osv": 32,
+    "semgrep": 4
+  },
+  "findings": [
+    {
+      "id": "SAST-01",
+      "kind": "positive",
+      "finding_type": "sast",
+      "expected_engines": [
+        "semgrep"
+      ],
+      "rule_ids": {
+        "semgrep": "arve.php.sql-injection"
+      },
+      "semgrep_profile": "standard",
+      "cwe": "CWE-89",
+      "file_path": "src/search.php",
+      "line_start": 10,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "$db->query() on a string literal concatenated with a LIKE pattern built from $_GET['q']."
+    },
+    {
+      "id": "SAST-02",
+      "kind": "positive",
+      "finding_type": "sast",
+      "expected_engines": [
+        "semgrep"
+      ],
+      "rule_ids": {
+        "semgrep": "arve.php.command-injection"
+      },
+      "semgrep_profile": "standard",
+      "cwe": "CWE-78",
+      "file_path": "src/convert.php",
+      "line_start": 24,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "shell_exec on a literal concatenated with the unvalidated ?format= value."
+    },
+    {
+      "id": "SAST-03",
+      "kind": "positive",
+      "finding_type": "sast",
+      "expected_engines": [
+        "semgrep"
+      ],
+      "rule_ids": {
+        "semgrep": "arve.php.eval-injection"
+      },
+      "semgrep_profile": "standard",
+      "cwe": "CWE-95",
+      "file_path": "src/settings.php",
+      "line_start": 9,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "eval() on the posted settings bundle."
+    },
+    {
+      "id": "SAST-04",
+      "kind": "positive",
+      "finding_type": "sast",
+      "expected_engines": [
+        "semgrep"
+      ],
+      "rule_ids": {
+        "semgrep": "arve.php.path-traversal"
+      },
+      "semgrep_profile": "standard",
+      "cwe": "CWE-22",
+      "file_path": "src/docs.php",
+      "line_start": 38,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "file_get_contents on a literal directory concatenated with ?name=. The plan's $dir prefix became a string literal because the rule needs one."
+    },
+    {
+      "id": "SEC-01",
+      "kind": "positive",
+      "finding_type": "secret",
+      "expected_engines": [
+        "gitleaks"
+      ],
+      "rule_ids": {
+        "gitleaks": "generic-api-key"
+      },
+      "semgrep_profile": null,
+      "cwe": "CWE-798",
+      "file_path": "src/config.php",
+      "line_start": 12,
+      "line_span": 1,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "Download-link JWT signing key hardcoded in the config array and passed to JWT::encode in src/token.php."
+    },
+    {
+      "id": "SEC-02",
+      "kind": "positive",
+      "finding_type": "secret",
+      "expected_engines": [
+        "gitleaks"
+      ],
+      "rule_ids": {
+        "gitleaks": "private-key"
+      },
+      "semgrep_profile": null,
+      "cwe": "CWE-321",
+      "file_path": "keys/signing.pem",
+      "line_start": 2,
+      "line_span": 1,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "RSA private key generated with openssl."
+    },
+    {
+      "id": "SEC-03",
+      "kind": "positive",
+      "finding_type": "secret",
+      "expected_engines": [
+        "gitleaks"
+      ],
+      "rule_ids": {
+        "gitleaks": "generic-api-key"
+      },
+      "semgrep_profile": null,
+      "cwe": "CWE-798",
+      "file_path": ".github/workflows/ci.yml",
+      "line_start": 13,
+      "line_span": 1,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "Deploy token in a workflow env block. Deliberately not a provider-prefixed token (ghp_ etc.), to stay clear of GitHub push protection."
+    },
+    {
+      "id": "SEC-05",
+      "kind": "positive",
+      "finding_type": "secret",
+      "expected_engines": [
+        "gitleaks"
+      ],
+      "rule_ids": {
+        "gitleaks": "generic-api-key"
+      },
+      "semgrep_profile": null,
+      "cwe": "CWE-798",
+      "file_path": "src/notify.php",
+      "line_start": 7,
+      "cross_engine_group": null,
+      "history_only": true,
+      "notes": "SMTP relay token in a file that is added and then deleted two commits later. Only a git-history scan finds it. Built by scripts/seed_history.py, which derives the value from a seed so it never appears at HEAD.",
+      "history": {
+        "file_path": "src/notify.php",
+        "line_start": 7,
+        "introduced_in": "Add document conversion with email notification on failure",
+        "removed_in": "Replace email notifications with Slack alerts"
+      }
+    },
+    {
+      "id": "SEC-06",
+      "kind": "positive",
+      "finding_type": "secret",
+      "expected_engines": [
+        "gitleaks"
+      ],
+      "rule_ids": {
+        "gitleaks": "slack-webhook-url"
+      },
+      "semgrep_profile": null,
+      "cwe": "CWE-798",
+      "file_path": "docs/runbook.md",
+      "line_start": 25,
+      "line_span": 1,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "Slack incoming webhook in an ops runbook (a non-code location)."
+    },
+    {
+      "id": "DEP-01",
+      "kind": "positive",
+      "finding_type": "dependency",
+      "expected_engines": [
+        "osv"
+      ],
+      "rule_ids": {
+        "osv": [
+          "GHSA-25mq-v84q-4j7r",
+          "GHSA-94pj-82f3-465w",
+          "GHSA-cwmx-hcrq-mhc3",
+          "GHSA-cwxw-98qj-8qjx",
+          "GHSA-f283-ghqc-fg79",
+          "GHSA-f2wf-25xc-69c9",
+          "GHSA-f7vp-7xgx-4w4r",
+          "GHSA-g446-98w2-8p5w",
+          "GHSA-h95v-h523-3mw8",
+          "GHSA-q559-8m2m-g699",
+          "GHSA-v5mv-p594-2x33",
+          "GHSA-w248-ffj2-4v5q",
+          "GHSA-wm3w-8rrp-j577",
+          "GHSA-wpwq-4j6v-78m3"
+        ]
+      },
+      "semgrep_profile": null,
+      "cwe": null,
+      "file_path": "composer.lock",
+      "line_start": 117,
+      "locator": "\"name\": \"guzzlehttp/guzzle\"",
+      "cross_engine_group": null,
+      "history_only": false,
+      "package": "guzzlehttp/guzzle",
+      "version": "7.4.0",
+      "ecosystem": "Packagist",
+      "notes": "14 OSV records reported by osv-scanner 1.9.2, identical to the osv.dev query for this version on 2026-10-04. HTTP client behind POST /docs/import-url."
+    },
+    {
+      "id": "DEP-02",
+      "kind": "positive",
+      "finding_type": "dependency",
+      "expected_engines": [
+        "osv"
+      ],
+      "rule_ids": {
+        "osv": [
+          "GHSA-2x45-7fc3-mxwq",
+          "GHSA-8xf4-w7qw-pjjw"
+        ]
+      },
+      "semgrep_profile": null,
+      "cwe": null,
+      "file_path": "composer.lock",
+      "line_start": 60,
+      "locator": "\"name\": \"firebase/php-jwt\"",
+      "cross_engine_group": null,
+      "history_only": false,
+      "package": "firebase/php-jwt",
+      "version": "v5.5.1",
+      "ecosystem": "Packagist",
+      "notes": "2 OSV records reported by osv-scanner 1.9.2, identical to the osv.dev query for this version on 2026-10-04. Signs download-link tokens in src/token.php. The version is recorded with the v prefix exactly as composer.lock and osv-scanner report it."
+    },
+    {
+      "id": "DEP-03",
+      "kind": "positive",
+      "finding_type": "dependency",
+      "expected_engines": [
+        "osv"
+      ],
+      "rule_ids": {
+        "osv": [
+          "GHSA-2g2g-8p8h-fgwm",
+          "GHSA-4j38-f5cw-54h7",
+          "GHSA-529h-vh3j-85hq",
+          "GHSA-52m2-vc4m-jj33",
+          "GHSA-5v5v-ww74-355v",
+          "GHSA-6377-hfv9-hqf6",
+          "GHSA-6j75-5wfj-gh66",
+          "GHSA-7fxw-r6jv-74c8",
+          "GHSA-7p85-w9px-jpjp",
+          "GHSA-8x9c-rmqh-456c",
+          "GHSA-h8vq-8gpg-mhcg",
+          "GHSA-jjxq-ff2g-95vh",
+          "GHSA-p42q-9prx-q5wq",
+          "GHSA-pr2w-4gpj-cpq4",
+          "GHSA-vcc8-phrv-43wj"
+        ]
+      },
+      "semgrep_profile": null,
+      "cwe": null,
+      "file_path": "composer.lock",
+      "line_start": 962,
+      "locator": "\"name\": \"twig/twig\"",
+      "cross_engine_group": null,
+      "history_only": false,
+      "package": "twig/twig",
+      "version": "v3.4.2",
+      "ecosystem": "Packagist",
+      "notes": "15 OSV records reported by osv-scanner 1.9.2, identical to the osv.dev query for this version on 2026-10-04. Renders the preview page. The version is recorded with the v prefix exactly as composer.lock and osv-scanner report it."
+    },
+    {
+      "id": "DEP-04",
+      "kind": "positive",
+      "finding_type": "dependency",
+      "expected_engines": [
+        "osv"
+      ],
+      "rule_ids": {
+        "osv": [
+          "GHSA-62m3-fc7f-jpp8"
+        ]
+      },
+      "semgrep_profile": null,
+      "cwe": null,
+      "file_path": "composer.lock",
+      "line_start": 10,
+      "locator": "\"name\": \"erusev/parsedown\"",
+      "cross_engine_group": null,
+      "history_only": false,
+      "package": "erusev/parsedown",
+      "version": "1.7.1",
+      "ecosystem": "Packagist",
+      "notes": "1 OSV record reported by osv-scanner 1.9.2, identical to the osv.dev query for this version on 2026-10-04. Renders Markdown in the preview."
+    },
+    {
+      "id": "SAFE-01",
+      "kind": "negative",
+      "finding_type": "control",
+      "expected_engines": [],
+      "rule_ids": {},
+      "semgrep_profile": null,
+      "cwe": null,
+      "file_path": "src/repository.php",
+      "line_start": 8,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "PDO prepared statement with a bound parameter."
+    },
+    {
+      "id": "SAFE-02",
+      "kind": "negative",
+      "finding_type": "control",
+      "expected_engines": [],
+      "rule_ids": {},
+      "semgrep_profile": null,
+      "cwe": null,
+      "file_path": "src/convert.php",
+      "line_start": 9,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "shell_exec on a command whose only variable part went through escapeshellarg. The command is bound to a variable first: see the repo-level note on arve.php.command-injection."
+    },
+    {
+      "id": "SAFE-03",
+      "kind": "negative",
+      "finding_type": "control",
+      "expected_engines": [],
+      "rule_ids": {},
+      "semgrep_profile": null,
+      "cwe": null,
+      "file_path": "src/docs.php",
+      "line_start": 61,
+      "cross_engine_group": null,
+      "history_only": false,
+      "notes": "file_get_contents on basename() of the request name, after an extension allowlist. The path is bound to a variable first: see the repo-level note on arve.php.path-traversal."
+    }
+  ],
+  "notes": [
+    "CodeQL does not support PHP, so engine_expectations.codeql is \"skipped\" and no entry expects it. ARVE must finish the scan as COMPLETED with CodeQL skipped: not PARTIAL, not FAILED.",
+    "SEC-04 is deliberately unused. IDs are aligned with the Python and JS testbeds, where SEC-05 is the history-only secret and SEC-06 the runbook webhook; the PHP matrix has one HEAD secret fewer.",
+    "Known ARVE false positive (Semgrep): arve.php.command-injection and arve.php.path-traversal match the syntactic shape f(\"...\" . $X) for any $X, so shell_exec(\"cmd \" . escapeshellarg($x)) and file_get_contents(\"dir/\" . basename($x)) are reported. SAFE-02 and SAFE-03 bind the argument to a variable first; no control asserts the false positive.",
+    "ARVE rulepack gap (PHP): the same rules need a string literal as the left operand of a single concatenation. A three-part concatenation (\"a\" . $x . \"b\"), a constant or __DIR__ prefix, or a command built in a variable is not matched. The SAST plants use the exact two-operand shape.",
+    "composer.lock was generated with `composer update --no-install --no-security-blocking`: Composer 2.9+ refuses to resolve versions with known advisories by default. Transitive packages resolve to current, advisory-free versions."
+  ],
+  "expected_counts_note": "Working-tree counts, not plant counts: the 4 DEP plants yield 32 OSV records. gitleaks_history = the 4 HEAD secrets, each reported at the commit that added it, plus SEC-05."
+}
